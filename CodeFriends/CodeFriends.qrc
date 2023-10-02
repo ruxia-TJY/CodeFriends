@@ -1,0 +1,15 @@
+<RCC>
+    <qresource prefix="/icon">
+        <file>resource/PNG_add.png</file>
+        <file>resource/PNG_attachment.png</file>
+        <file>resource/PNG_delete.png</file>
+        <file>resource/PNG_download.png</file>
+        <file>resource/PNG_edit.png</file>
+        <file>resource/PNG_help.png</file>
+        <file>resource/PNG_MiniSize.png</file>
+        <file>resource/PNG_read.png</file>
+        <file>resource/PNG_refresh.png</file>
+        <file>resource/PNG_save.png</file>
+        <file>resource/PNG_setting.png</file>
+    </qresource>
+</RCC>
