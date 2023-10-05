@@ -12,4 +12,8 @@
         <file>resource/PNG_save.png</file>
         <file>resource/PNG_setting.png</file>
     </qresource>
+    <qresource prefix="/qm">
+        <file>Translation/Translation_en.qm</file>
+        <file>Translation/Translation_zh_CN.qm</file>
+    </qresource>
 </RCC>
