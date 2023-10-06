@@ -12,6 +12,4 @@
 
 #define DESCRIPTION "Friends help you for manage code"
 
-#define DATABASE_FORMAT ("yyyy-MM-dd HH:mm:ss")
-
 #endif // !CONSTANT_H

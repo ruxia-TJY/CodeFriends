@@ -26,7 +26,7 @@
 #include "database.h"
 
 #include "UiAbout.h"
-
+#include "UiSetting.h"
 
 QT_BEGIN_NAMESPACE
 class QTextEdit;
@@ -51,16 +51,23 @@ public slots:
 private:
     Ui::CodeFriendsClass ui;
 
+    // 当前文本框是否为改变
+    bool editor_changed_mode = false;
+
     void closeEvent(QCloseEvent* event);
 
     void setupEditor();
     void setupUI();
     
     void setupLibrary();
-    void setupTitleList();  
+    void setupTitleList();
+
     void timeUpdate();
 
-    QLineEdit* titleline;
+    UiAbout* uiabout;
+    UiSetting* uisetting;
+
+    QLineEdit* lE_title;
     CodeEditor* editor;
     Highlighter* highlighter;
     Database* db;
@@ -69,12 +76,16 @@ private:
     QLineEdit* lE_search;
     
     QListWidget* lW_DB;
+    QLabel* lbl_title_list_count;
     
-    UiAbout* uiabout;
 
     QTimer* timer;
     QDateTime* current_datetime;
+
+    QLabel* lbl_attachment_info;
     QLabel* lbl_current_datetime;
+    QLabel* lbl_create_datetime;
+    QLabel* lbl_update_datetime;
 
 private slots:
     void add_code();
@@ -82,5 +93,10 @@ private slots:
     void delete_code();
     void refresh_code();
 
+    void search_title();
+
+    void readCodeData();
+
     void show_ui_about();
+    void show_ui_setting();
 };

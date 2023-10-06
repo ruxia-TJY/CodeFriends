@@ -114,6 +114,38 @@ bool Database::deleteLibrary(QString name)
 	return true;
 }
 
+cfcode Database::queryCodeData(QString title, QString library)
+{
+	cfcode db;
+	QString sql = QString("SELECT * FROM TABLE_CODE_%1 WHERE title=\"%2\"").arg(library,title);
+	QSqlQuery sqlQuery;
+	sqlQuery.prepare(sql);
+
+	if (!sqlQuery.exec()) {
+		QMessageBox::warning(nullptr, "Error", "Fail: Could not query Database");
+		return db;
+	}
+	else {
+		sqlQuery.next();
+		db.title = sqlQuery.value(0).toString();
+		db.code = sqlQuery.value(1).toString();
+		db.createDateTime = sqlQuery.value(2).toString();
+		db.updateDateTime = sqlQuery.value(3).toString();
+	}
+
+	return db;
+}
+
+bool Database::deleteCodeData(QString title, QString library)
+{
+	QSqlQuery sqlQuery;
+	QString sql = QString("DELETE FROM TABLE_CODE_%1 WHERE title = \"%2\"")
+		.arg(library, title);
+	sqlQuery.prepare(sql);
+	if (!sqlQuery.exec())return false;
+	return true;
+}
+
 QStringList Database::getLibraryList()
 {
 	QStringList lst;
@@ -131,11 +163,11 @@ QStringList Database::getLibraryList()
 	return lst;
 }
 
-QStringList Database::getTitleListInLibrary(QString title)
+QStringList Database::getTitleListInLibrary(QString library)
 {
 	QStringList lst;
 	QSqlQuery sqlQuery;
-	QString sql = QString("SELECT title FROM TABLE_CODE_%1").arg(title);
+	QString sql = QString("SELECT title FROM TABLE_CODE_%1").arg(library);
 	sqlQuery.prepare(sql);
 	if (!sqlQuery.exec()) {
 		QMessageBox::warning(nullptr, "Error", "Fail to query DATABASE");
@@ -169,10 +201,10 @@ bool Database::createCode(QString title, QString code, QString createDateTime, Q
 	return false;
 }
 
-int Database::isCodeTitleExist(QString title)
+int Database::isCodeTitleExist(QString title,QString library)
 {
 	QSqlQuery sqlQuery;
-	QString sql = QString("SELECT title FROM TABLE_CODE WHERE title='%1'").arg(title);
+	QString sql = QString("SELECT title FROM TABLE_CODE_%1 WHERE title='%2'").arg(library,title);
 	if (!sqlQuery.exec(sql)){
 		return -1;
 	}
