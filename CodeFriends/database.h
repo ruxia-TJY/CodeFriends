@@ -38,7 +38,7 @@ public:
 
 	QStringList getLibraryList();
 
-	QStringList getTitleListInLibrary(QString title)
+	QStringList getTitleListInLibrary(QString title);
 
 	bool createCode(cfcode &cfcodedb);
 	bool createCode(QString title, QString code,QString createDateTime,QString updateTime,QString library);
