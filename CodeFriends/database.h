@@ -16,7 +16,6 @@ typedef struct {
 	QString updateDateTime;
 	QString library;
 	QByteArray attachment;
-
 }cfcode;
 
 class Database
@@ -29,12 +28,20 @@ public:
 	bool openDB();
 	void closeDB();
 
-	void createTable();
-	bool createLibrary(QString name,QString description);
+	bool createTableLibrary();									// create TABLE_LIBRARY
+	bool createTable(QString name);								// create TABLE_CODE_name
+	
+	bool isLibraryExist(QString name);							// is library name in TABLE_LIBRARY
+	bool createLibrary(QString name, QString description);		// add library to TABLE_LIBRARY and create TABLE_CODE_name
+	bool deleteLibrary(QString name);							// delete library name in TABLE_LIBRARY and delete TABLE_CODE_name
+
+
 	QStringList getLibraryList();
 
+	QStringList getTitleListInLibrary(QString title)
+
 	bool createCode(cfcode &cfcodedb);
-	bool createCode(QString title, QString code);
+	bool createCode(QString title, QString code,QString createDateTime,QString updateTime,QString library);
 	
 	int isCodeTitleExist(QString title);
 	bool isTableExist(QString& tableName);

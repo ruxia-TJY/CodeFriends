@@ -18,6 +18,7 @@
 #include <qfileinfo.h>
 #include <qdatetime.h>
 #include <qstringlist.h>
+#include <qtimer.h>
 
 #include "ui_CodeFriends.h"
 #include "Highlighter.h"
@@ -56,6 +57,8 @@ private:
     void setupUI();
     
     void setupLibrary();
+    void setupTitleList();  
+    void timeUpdate();
 
     QLineEdit* titleline;
     CodeEditor* editor;
@@ -68,6 +71,10 @@ private:
     QListWidget* lW_DB;
     
     UiAbout* uiabout;
+
+    QTimer* timer;
+    QDateTime* current_datetime;
+    QLabel* lbl_current_datetime;
 
 private slots:
     void add_code();

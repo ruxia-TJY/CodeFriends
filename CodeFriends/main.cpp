@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
     a.installTranslator(&qtTranslator);
 
     QFont font = a.font();
-    font.setPointSize(20);
+    font.setPointSize(15);
     a.setFont(font);
 
 

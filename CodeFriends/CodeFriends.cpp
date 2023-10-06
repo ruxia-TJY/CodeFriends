@@ -8,18 +8,25 @@ CodeFriends::CodeFriends(QWidget *parent)
     this->resize(QSize(2000, 1000));
     
     db = new Database();
+
     QFileInfo dbfile("db_codefriends.db");
-    
     if (!dbfile.isFile()) {
         db->createDB();
     }
     
     db->openDB();
+
     uiabout = new UiAbout();
 
     setupEditor();
     setupUI();
+    timer = new QTimer;
+    current_datetime = new QDateTime;
+    connect(timer, &QTimer::timeout, this, &CodeFriends::timeUpdate);
+    timer->start(1000);
+
     setupLibrary();
+    setupTitleList();
 }
 
 CodeFriends::~CodeFriends()
@@ -37,7 +44,6 @@ void CodeFriends::closeEvent(QCloseEvent* event)
     
 }
 
-//! [1]
 void CodeFriends::setupEditor()
 {
     QFont font;
@@ -165,6 +171,12 @@ void CodeFriends::setupUI()
     vboxlayout->addWidget(editor);
     widget_editor->setLayout(vboxlayout);
     setCentralWidget(widget_editor);
+
+
+    // statusBar
+    lbl_current_datetime = new QLabel;
+    statusBar()->addPermanentWidget(lbl_current_datetime);
+
 }
 
 void CodeFriends::setupLibrary()
@@ -174,6 +186,21 @@ void CodeFriends::setupLibrary()
     cB_lib->addItems(lst);
 }
 
+void CodeFriends::setupTitleList()
+{
+    lW_DB->clear();
+    QString title = cB_lib->currentText();
+    QStringList lst = db->getTitleListInLibrary(title);
+    lW_DB->addItems(lst);
+}
+
+void CodeFriends::timeUpdate()
+{
+    current_datetime = &QDateTime::currentDateTime();
+    QString str_current_datetime = current_datetime->toString("yyyy-MM-dd HH:mm:ss");
+    lbl_current_datetime->setText(str_current_datetime);
+}
+
 void CodeFriends::save_code()
 {
     if (0 == titleline->text().length()) {
@@ -181,35 +208,38 @@ void CodeFriends::save_code()
         return;
     }
 
-    // check title in db   
+    // check title exist in db   
     QString title = titleline->text();
     int mode = db->isCodeTitleExist(title);
     QString code = editor->toPlainText();
-    QDateTime current_datetime = QDateTime::currentDateTime();
-
-    QString updateDateTime = current_datetime.toString("yyyy-mm-dd hh:mm:ss");
-    
+    QDateTime curDateTime = QDateTime::currentDateTime();
+    QString updateDateTime = curDateTime.toString("yyyy-MM-dd HH:mm:ss");
+    QString library = this->cB_lib->currentText();
 
     if (mode >= 1) {
-        // 数据库中存在，修改
-        //QMessageBox::warning(this, tr("警告"), tr("当前标题已存在！请重新设置！"));
+        // if exist in database, update
+
 
     }
     else {
-        // 数据库中不存在，添加
+        // not exist, add
         cfcode data = {
             title,
             code,
             updateDateTime,
             updateDateTime,
-            
+            library,
         };
-        //db->createCode(data);
+        if (db->createCode(data)) {
+            QMessageBox::information(this, tr("提示"), tr("数据添加成功！"));
+        }
+        else {
+            QMessageBox::warning(this, tr("提示"), tr("数据添加失败！"));
+        }
+
+        // refresh list
+        setupTitleList();
     }
-    
-   
-
-
 }
 
 void CodeFriends::delete_code()
