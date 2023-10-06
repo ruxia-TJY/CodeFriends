@@ -260,17 +260,16 @@ void CodeFriends::save_code()
         };
         if (db->createCode(data)) {
             QMessageBox::information(this, tr("提示"), tr("数据添加成功！"));
+            // refresh list
+            setupTitleList();
+            editor_changed_mode = false;
+
+            QList<QListWidgetItem*>match = lW_DB->findItems(title, Qt::MatchExactly);
+            lW_DB->setCurrentItem(match[0]);
         }
         else {
             QMessageBox::warning(this, tr("提示"), tr("数据添加失败！"));
         }
-
-        // refresh list
-        setupTitleList();
-        editor_changed_mode = false;
-
-        QList<QListWidgetItem*>match = lW_DB->findItems(title, Qt::MatchExactly);
-        lW_DB->setCurrentItem(match[0]);
     }
 }
 

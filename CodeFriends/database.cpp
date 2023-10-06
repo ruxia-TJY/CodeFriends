@@ -75,10 +75,12 @@ bool Database::createTable(QString name)
 bool Database::isLibraryExist(QString name)
 {
 	QSqlQuery sqlQuery;
-	QString sql = QString("SELECT name FROM TABLE_LIBRARY WHERE name = \"%1\"")
-		.arg(name);
+	/*QString sql = QString("SELECT name FROM TABLE_LIBRARY WHERE name = \"%1\"")
+		.arg(name);*/
 
-	sqlQuery.prepare(sql);
+	sqlQuery.prepare("SELECT name FROM TABLE_LIBRARY WHERE name = :name");
+	sqlQuery.bindValue(":name", name);
+
 	if (!sqlQuery.exec())return false;
 	sqlQuery.last();
 	int count = sqlQuery.at() + 1;
@@ -117,9 +119,10 @@ bool Database::deleteLibrary(QString name)
 cfcode Database::queryCodeData(QString title, QString library)
 {
 	cfcode db;
-	QString sql = QString("SELECT * FROM TABLE_CODE_%1 WHERE title=\"%2\"").arg(library,title);
+
 	QSqlQuery sqlQuery;
-	sqlQuery.prepare(sql);
+	sqlQuery.prepare("SELECT * FROM TABLE_CODE_" + library + " WHERE title=:title");
+	sqlQuery.bindValue(":title", title);
 
 	if (!sqlQuery.exec()) {
 		QMessageBox::warning(nullptr, "Error", "Fail: Could not query Database");
@@ -139,9 +142,9 @@ cfcode Database::queryCodeData(QString title, QString library)
 bool Database::deleteCodeData(QString title, QString library)
 {
 	QSqlQuery sqlQuery;
-	QString sql = QString("DELETE FROM TABLE_CODE_%1 WHERE title = \"%2\"")
-		.arg(library, title);
-	sqlQuery.prepare(sql);
+
+	sqlQuery.prepare("DELETE FROM TABLE_CODE_" + library + " WHERE title = :title");
+	sqlQuery.bindValue(":title", title);
 	if (!sqlQuery.exec())return false;
 	return true;
 }
@@ -167,8 +170,8 @@ QStringList Database::getTitleListInLibrary(QString library)
 {
 	QStringList lst;
 	QSqlQuery sqlQuery;
-	QString sql = QString("SELECT title FROM TABLE_CODE_%1").arg(library);
-	sqlQuery.prepare(sql);
+
+	sqlQuery.prepare("SELECT title FROM TABLE_CODE_" + library);
 	if (!sqlQuery.exec()) {
 		QMessageBox::warning(nullptr, "Error", "Fail to query DATABASE");
 	}
@@ -184,12 +187,15 @@ QStringList Database::getTitleListInLibrary(QString library)
 bool Database::createCode(cfcode& cfcodedb)
 {
 	QSqlQuery sqlQuery;
-	QString sql = QString("INSERT INTO TABLE_CODE_%1 VALUES(\"%2\",\"%3\",\"%4\",\"%5\",NULL)")
-		.arg(cfcodedb.library,cfcodedb.title,cfcodedb.code,cfcodedb.createDateTime,cfcodedb.updateDateTime);
 
-	sqlQuery.prepare(sql);
+	sqlQuery.prepare("INSERT INTO TABLE_CODE_" +  cfcodedb.library + " VALUES(:title,:code,:create,:update,NULL)");	
+	sqlQuery.bindValue(":title", cfcodedb.title);
+	sqlQuery.bindValue(":code", cfcodedb.code);
+	sqlQuery.bindValue(":create", cfcodedb.createDateTime);
+	sqlQuery.bindValue(":update", cfcodedb.updateDateTime);
 	
 	if (!sqlQuery.exec()) {
+		qDebug() << sqlQuery.lastError();
 		QMessageBox::warning(nullptr, "Error", "Fail to insert data.");
 		return false;
 	}
@@ -204,8 +210,11 @@ bool Database::createCode(QString title, QString code, QString createDateTime, Q
 int Database::isCodeTitleExist(QString title,QString library)
 {
 	QSqlQuery sqlQuery;
-	QString sql = QString("SELECT title FROM TABLE_CODE_%1 WHERE title='%2'").arg(library,title);
-	if (!sqlQuery.exec(sql)){
+	
+	sqlQuery.prepare("SELECT title FROM TABLE_CODE_" + library + " WHERE title=:title");
+	sqlQuery.bindValue(":title", title);
+
+	if (!sqlQuery.exec()){
 		return -1;
 	}
 
