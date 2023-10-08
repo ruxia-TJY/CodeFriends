@@ -149,6 +149,23 @@ bool Database::deleteCodeData(QString title, QString library)
 	return true;
 }
 
+bool Database::updateCodeData(QString title,QString library, cfcode& db)
+{
+	QSqlQuery sqlQuery;
+	sqlQuery.prepare("UPDATE TABLE_CODE_" + library + 
+		" SET title=:newtitle,code=:code,updateDateTime=:updateDateTime WHERE title=:title");
+	sqlQuery.bindValue(":newtitle", db.title);
+	sqlQuery.bindValue(":code", db.code);
+	sqlQuery.bindValue(":updateDateTime", db.updateDateTime);
+	sqlQuery.bindValue(":title", title);
+	if (!sqlQuery.exec()) {
+		return false;
+	}
+	else {
+		return true;
+	}
+}
+
 QStringList Database::getLibraryList()
 {
 	QStringList lst;
@@ -230,4 +247,16 @@ bool Database::isTableExist(QString& tableName)
 	if (database.tables().contains(tableName))return true;
 	
 	return false;
+}
+
+bool Database::isCodeDataHasAttachment(QString title, QString library)
+{
+	QSqlQuery sqlQuery;
+
+	sqlQuery.prepare("SELECT :title FROM TABLE_CODE_" + library + "WHERE attachment IS NULL");
+	sqlQuery.bindValue(":title", title);
+	if (!sqlQuery.exec()) {
+		return false;
+	}
+	return true;
 }

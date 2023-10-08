@@ -245,8 +245,20 @@ void CodeFriends::save_code()
 
     if (mode >= 1) {
         // if exist in database, update
-        // TODO update code 
         editor_changed_mode = false;
+
+        cfcode data = {
+            title,
+            code,
+            updateDateTime,
+            updateDateTime,
+            library,
+        };
+        if (db->updateCodeData(title, library, data)) {
+            QMessageBox::information(this, tr("提示"), tr("修改成功！"));
+            //refresh
+            lbl_update_datetime->setText(QString("Update:%1").arg(updateDateTime));
+        }
     }
     else {
         
@@ -318,6 +330,13 @@ void CodeFriends::readCodeData()
     editor->setPlainText(code.code);
     lbl_create_datetime->setText(QString("Create:%1").arg(code.createDateTime));
     lbl_update_datetime->setText(QString("Update:%1").arg(code.updateDateTime));
+
+    if (db->isCodeDataHasAttachment(title, library)) {
+        lbl_attachment_info->setText(QString("Attachment:有"));
+    }
+    else {
+        lbl_attachment_info->setText(QString("Attachment:无"));
+    }
     
 }
 

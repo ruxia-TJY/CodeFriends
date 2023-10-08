@@ -37,6 +37,8 @@ public:
 
 	cfcode queryCodeData(QString title, QString library);
 	bool deleteCodeData(QString title, QString library);
+	
+	bool updateCodeData(QString title,QString library, cfcode& db);
 
 	QStringList getLibraryList();
 
@@ -48,6 +50,9 @@ public:
 	
 	int isCodeTitleExist(QString title,QString library);
 	bool isTableExist(QString& tableName);
+
+
+	bool isCodeDataHasAttachment(QString title, QString library);
 private:
 	QSqlDatabase database;
 
