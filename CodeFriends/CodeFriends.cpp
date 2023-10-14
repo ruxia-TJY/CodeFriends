@@ -30,6 +30,9 @@ CodeFriends::CodeFriends(QWidget *parent)
     setupLibrary();
     setupTitleList();
     if (lW_DB->count() > 0)lW_DB->setCurrentRow(0);
+
+    connect(uisetting, SIGNAL(refreshParentLibrary()), this, SLOT(setupLibrary()));
+    
 }
 
 CodeFriends::~CodeFriends()
@@ -68,10 +71,13 @@ void CodeFriends::setupUI()
     pb_add->setToolTip(tr("添加 （Ctrl + N)"));
     pb_add->setStatusTip(tr("添加 (Ctrl + N)"));
     pb_add->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_N));
+
     QAction* pb_save = new QAction(QIcon(":/icon/resource/PNG_save.png"), tr("保存"), this);
     pb_save->setToolTip(tr("保存 (Ctrl + S)"));
     pb_save->setStatusTip(tr("保存 (Ctrl + S)"));
     pb_save->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_S));
+    pb_save->setEnabled(false);
+
     QAction* pb_delete = new QAction(QIcon(":/icon/resource/PNG_delete.png"), tr("删除"), this);
     pb_delete->setToolTip(tr("删除 (delete)"));
     pb_delete->setStatusTip(tr("删除 (delete)"));
@@ -141,7 +147,8 @@ void CodeFriends::setupUI()
     cB_lib = new QComboBox;
     cB_lib->setFocusPolicy(Qt::NoFocus);
     toolBar_search->addWidget(cB_lib);
-    
+
+    connect(cB_lib, &QComboBox::currentTextChanged, this, &CodeFriends::setupTitleList);
 
     QLabel* lbl_search_caption = new QLabel(tr("搜索："));
     toolBar_search->addWidget(lbl_search_caption);
@@ -210,14 +217,19 @@ void CodeFriends::setupLibrary()
 void CodeFriends::setupTitleList()
 {
     lW_DB->clear();
+    editor->clear();
+    lE_title->clear();
     QString library = cB_lib->currentText();
+
+    if (library.isEmpty())return;
+
     QStringList lst = db->getTitleListInLibrary(library);
     lW_DB->addItems(lst);
     lW_DB->sortItems(Qt::AscendingOrder);
 
     QString count = QString("Count:%1").arg(lst.size());
     lbl_title_list_count->setText(count);
-    
+
 }
 
 void CodeFriends::timeUpdate()
@@ -308,9 +320,11 @@ void CodeFriends::delete_code()
 
 void CodeFriends::refresh_code()
 {
+    QString current = cB_lib->currentText();
     setupLibrary();
     setupTitleList();
-    if (lW_DB->count() > 1)lW_DB->setCurrentRow(0);
+    cB_lib->setCurrentText(current);
+    if (lW_DB->count() > 0)lW_DB->setCurrentRow(0);
 }
 
 void CodeFriends::show_ui_about()

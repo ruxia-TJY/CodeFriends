@@ -24,12 +24,11 @@ public:
 	Database();
 	~Database();
 
-	bool createDB();
-	bool openDB();
-	void closeDB();
+	bool createDB();											// create Database file
+	bool openDB();												// open Database
+	void closeDB();												// close Database
 
-	bool createTableLibrary();									// create TABLE_LIBRARY
-	bool createTable(QString name);								// create TABLE_CODE_name
+	bool createTable_Library();									// create TABLE_LIBRARY
 	
 	bool isLibraryExist(QString name);							// is library name in TABLE_LIBRARY
 	bool createLibrary(QString name, QString description);		// add library to TABLE_LIBRARY and create TABLE_CODE_name
@@ -37,25 +36,29 @@ public:
 
 	cfcode queryCodeData(QString title, QString library);
 	bool deleteCodeData(QString title, QString library);
-	
 	bool updateCodeData(QString title,QString library, cfcode& db);
 
 	QStringList getLibraryList();
 
 	QStringList getTitleListInLibrary(QString library);
 
+	int getTitleCount(QString library);
+
 
 	bool createCode(cfcode &cfcodedb);
 	bool createCode(QString title, QString code,QString createDateTime,QString updateTime,QString library);
 	
 	int isCodeTitleExist(QString title,QString library);
-	bool isTableExist(QString& tableName);
+	
 
 
 	bool isCodeDataHasAttachment(QString title, QString library);
 private:
 	QSqlDatabase database;
 
+
+	bool createTable(QString name);								// create TABLE_CODE_name
+	bool isTableExist(QString& tableName);
 };
 
 #endif

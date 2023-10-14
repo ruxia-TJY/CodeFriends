@@ -23,7 +23,7 @@ bool Database::createDB()
 	if(!openDB())return false;
 	// create TABLE_LIBRARY 
 	// the list for library;
-	if(!createTableLibrary())return false;
+	if(!createTable_Library())return false;
 	// create Default code table;
 	// default: TABLE_CODE_C
 	if (!createLibrary("C","code of C language")) return false;
@@ -41,7 +41,7 @@ void Database::closeDB()
 	database.close();
 }
 
-bool Database::createTableLibrary()
+bool Database::createTable_Library()
 {
 	QSqlQuery sqlQuery;
 	QString sql = QString("CREATE TABLE TABLE_LIBRARY (\
@@ -111,6 +111,10 @@ bool Database::deleteLibrary(QString name)
 	QSqlQuery sqlQuery;
 	sqlQuery.prepare(sql);
 
+	if (!sqlQuery.exec()) return false;
+
+	sqlQuery.prepare("DELETE FROM TABLE_LIBRARY WHERE name = :name");
+	sqlQuery.bindValue(":name", name);
 	if (!sqlQuery.exec()) return false;
 
 	return true;
@@ -199,6 +203,16 @@ QStringList Database::getTitleListInLibrary(QString library)
 		}
 	}
 	return lst;
+}
+
+int Database::getTitleCount(QString library)
+{
+	int count = 0;
+	QSqlQuery sqlQuery;
+	sqlQuery.exec("SELECT count(*) FROM TABLE_CODE_" + library);
+	sqlQuery.next();
+	count = sqlQuery.value(0).toInt();
+	return count;
 }
 
 bool Database::createCode(cfcode& cfcodedb)

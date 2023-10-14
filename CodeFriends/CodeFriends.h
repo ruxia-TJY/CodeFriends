@@ -1,3 +1,6 @@
+#ifndef QT_UI_MAINWINDOW_H
+#define QT_UI_MAIN_WINDOW_H
+
 #pragma execution_character_set("utf-8");
 
 #include <QtWidgets/QMainWindow>
@@ -41,12 +44,13 @@ class CodeFriends : public QMainWindow
     Q_OBJECT
 
 public:
-    CodeFriends(QWidget *parent = nullptr);
+    CodeFriends(QWidget* parent = nullptr);
     ~CodeFriends();
 
-
 public slots:
-    
+
+    void setupLibrary();
+    void setupTitleList();
 
 private:
     Ui::CodeFriendsClass ui;
@@ -58,9 +62,6 @@ private:
 
     void setupEditor();
     void setupUI();
-    
-    void setupLibrary();
-    void setupTitleList();
 
     void timeUpdate();
 
@@ -74,10 +75,10 @@ private:
 
     QComboBox* cB_lib;
     QLineEdit* lE_search;
-    
+
     QListWidget* lW_DB;
     QLabel* lbl_title_list_count;
-    
+
 
     QTimer* timer;
     QDateTime* current_datetime;
@@ -100,3 +101,6 @@ private slots:
     void show_ui_about();
     void show_ui_setting();
 };
+
+
+#endif // !QT_UI_MAINWINDOW_H
