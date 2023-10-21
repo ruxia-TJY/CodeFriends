@@ -35,10 +35,22 @@ int main(int argc, char *argv[])
     a.setApplicationName("CodeFriends");
     a.setApplicationDisplayName("CodeFriends");
     a.setApplicationVersion(VERSION);
-
+    
     QTranslator qtTranslator;
-    qtTranslator.load(":/qm/Translation/Translation_zh_CN.qm");
-    //qtTranslator.load(":/qm/Translation/Translation_en.qm");
+    QLocale locale;
+    switch (locale.language())
+    {
+    case QLocale::English:
+        qtTranslator.load(":/qm/Translation/Translation_en.qm");
+        break;
+    case QLocale::Chinese:
+        qtTranslator.load(":/qm/Translation/Translation_zh_CN.qm");
+        break;
+    default:
+        qtTranslator.load(":/qm/Translation/Translation_zh_CN.qm");
+        break;
+    }
+    
     a.installTranslator(&qtTranslator);
     
     Config config;

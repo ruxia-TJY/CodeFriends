@@ -67,12 +67,17 @@ void UiSetting::getlibrary()
 
 void UiSetting::addLibrary()
 {
-	bool ret = false;
-	QString name = QInputDialog::getText(this, "CodeFriends",
-		"Library Name:",QLineEdit::Normal,"",&ret);
+	QInputDialog dialog{ this,Qt::WindowCloseButtonHint };
+	dialog.setWindowTitle("CodeFriends");
+	dialog.setInputMode(QInputDialog::InputMode::TextInput);
+	dialog.setLabelText(tr("请输入要添加的库名称"));
+	dialog.setOkButtonText(tr("添加"));
+	dialog.setCancelButtonText(tr("取消"));
+	int result = dialog.exec();
 
+	QString name = dialog.textValue();
 	
-	if (!ret)return;
+	if (0 == result)return;
 
 	if (name.isEmpty()) {
 		QMessageBox::information(this, "Error", "Fail: input cannot be empty!");
@@ -108,11 +113,11 @@ void UiSetting::deleteLibrary()
 	}
 
 	if (!db->deleteLibrary(name)) {
-		QMessageBox::warning(this, "Error", "Fail: delete failed!");
+		QMessageBox::warning(this, "Error", "Fail: delete failed!",tr("确定"),0);
 		return;
 	};
 
-	QMessageBox::information(this, "CodeFriends", "Delete successful!");
+	QMessageBox::information(this, "CodeFriends", "Delete successful!",tr("确定"),0);
 
 	emit refreshParentLibrary();
 	getlibrary();

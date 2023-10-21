@@ -68,7 +68,10 @@ void CodeFriends::setupUI()
 
     editor = new CodeEditor;
 
-    connect(editor, &CodeEditor::textChanged, this, [=] {editormode = EDITORMODE_CHANGED; });
+    connect(editor, &CodeEditor::textChanged, this, [=] {
+        editormode = EDITORMODE_CHANGED; 
+        pb_save->setEnabled(true);
+        });
 
     highlighter = new Highlighter(editor->document());
 
@@ -84,7 +87,7 @@ void CodeFriends::setupUI()
     pb_add->setStatusTip(tr("添加 (Ctrl + N)"));
     pb_add->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_N));
 
-    QAction* pb_save = new QAction(QIcon(":/icon/resource/PNG_save.png"), tr("保存"), this);
+    pb_save = new QAction(QIcon(":/icon/resource/PNG_save.png"), tr("保存"), this);
     pb_save->setToolTip(tr("保存 (Ctrl + S)"));
     pb_save->setStatusTip(tr("保存 (Ctrl + S)"));
     pb_save->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_S));
@@ -313,6 +316,7 @@ void CodeFriends::save_code()
             QMessageBox::warning(this, tr("提示"), tr("数据添加失败！"));
         }
     }
+    pb_save->setEnabled(false);
 }
 
 void CodeFriends::delete_code()

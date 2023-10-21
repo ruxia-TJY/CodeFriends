@@ -88,6 +88,7 @@ private:
     QListWidget* lW_DB;
     QLabel* lbl_title_list_count;
 
+    QAction* pb_save;
 
     QTimer* timer;
     QDateTime* current_datetime;
