@@ -19,8 +19,8 @@ CodeFriends::CodeFriends(QWidget *parent)
     uiabout = new UiAbout();
     uisetting = new UiSetting();
 
-    setupEditor();
     setupUI();
+    setupConfig();
 
     timer = new QTimer;
     current_datetime = new QDateTime;
@@ -32,7 +32,6 @@ CodeFriends::CodeFriends(QWidget *parent)
     if (lW_DB->count() > 0)lW_DB->setCurrentRow(0);
 
     connect(uisetting, SIGNAL(refreshParentLibrary()), this, SLOT(setupLibrary()));
-    
 }
 
 CodeFriends::~CodeFriends()
@@ -40,26 +39,39 @@ CodeFriends::~CodeFriends()
 
 void CodeFriends::closeEvent(QCloseEvent* event)
 {
-    //int result = QMessageBox::information(this, tr("提示"), tr("当前未保存，继续将丢失更改！"),
-    //    tr("继续"), tr("取消"), 0, 1);
-    //if (1 == result) {
-    //    event->ignore();
-    //}
+    if (editormode == EDITORMODE_CHANGED) {
+        QMessageBox msg(QMessageBox::Question, "CodeFriends", tr("当前代码已变动，是否保存？"));
+        msg.setStandardButtons(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+        msg.setButtonText(QMessageBox::Yes, tr("保存并退出"));
+        msg.setButtonText(QMessageBox::No, tr("不保存并退出"));
+        msg.setButtonText(QMessageBox::Cancel, tr("取消"));
+        int result = msg.exec();
+
+        switch (result)
+        {
+        case QMessageBox::Yes:
+            save_code();
+            break;
+        case QMessageBox::Cancel:
+            event->ignore();
+        default:
+            break;
+        }
+    }
 
     uiabout->close();
-    uisetting->close();
-    
-}
-
-void CodeFriends::setupEditor()
-{
-    editor = new CodeEditor;
-
-    highlighter = new Highlighter(editor->document());
+    uisetting->close();    
 }
 
 void CodeFriends::setupUI()
-{
+{   
+
+    editor = new CodeEditor;
+
+    connect(editor, &CodeEditor::textChanged, this, [=] {editormode = EDITORMODE_CHANGED; });
+
+    highlighter = new Highlighter(editor->document());
+
     statusBar()->showMessage(tr("加载界面..."), 1000);
     // toolBar_edit
     QToolBar* toolBar_edit = new QToolBar(this);
@@ -82,6 +94,7 @@ void CodeFriends::setupUI()
     pb_delete->setToolTip(tr("删除 (delete)"));
     pb_delete->setStatusTip(tr("删除 (delete)"));
     pb_delete->setShortcut(QKeySequence(Qt::Key_Delete));
+
     QAction* pb_refresh = new QAction(QIcon(":/icon/resource/PNG_refresh.png"), tr("刷新"), this);
     pb_refresh->setToolTip(tr("刷新 (F5)"));
     pb_refresh->setStatusTip(tr("刷新 (F5)"));
@@ -207,6 +220,11 @@ void CodeFriends::setupUI()
 
 }
 
+void CodeFriends::setupConfig()
+{
+    editor->setFont(config.Font_editor);
+}
+
 void CodeFriends::setupLibrary()
 {
     cB_lib->clear();
@@ -241,6 +259,7 @@ void CodeFriends::timeUpdate()
 
 void CodeFriends::save_code()
 {
+
     if (0 == lE_title->text().length()) {
         QMessageBox::warning(this, tr("警告"), tr("请设置一个标题！"));
         return;
@@ -257,7 +276,7 @@ void CodeFriends::save_code()
 
     if (mode >= 1) {
         // if exist in database, update
-        editor_changed_mode = false;
+        editormode = EDITORMODE_SAVED;
 
         cfcode data = {
             title,
@@ -273,7 +292,6 @@ void CodeFriends::save_code()
         }
     }
     else {
-        
         // not exist, add
         cfcode data = {
             title,
@@ -286,7 +304,7 @@ void CodeFriends::save_code()
             QMessageBox::information(this, tr("提示"), tr("数据添加成功！"));
             // refresh list
             setupTitleList();
-            editor_changed_mode = false;
+            editormode = EDITORMODE_SAVED;
 
             QList<QListWidgetItem*>match = lW_DB->findItems(title, Qt::MatchExactly);
             lW_DB->setCurrentItem(match[0]);
@@ -316,10 +334,29 @@ void CodeFriends::delete_code()
     else {
         QMessageBox::warning(this, tr("Error"), tr("删除失败！"));
     }
+    editormode = EDITORMODE_DEFAULT;
 }
 
 void CodeFriends::refresh_code()
 {
+    if (editormode == EDITORMODE_CHANGED) {
+        QMessageBox msg(QMessageBox::Question, "CodeFriends", tr("是否保存当前代码？"));
+        msg.setStandardButtons(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+        msg.setButtonText(QMessageBox::Yes, tr("保存并继续"));
+        msg.setButtonText(QMessageBox::No, tr("不保存并继续"));
+        msg.setButtonText(QMessageBox::Cancel, tr("取消"));
+        int result = msg.exec();
+        switch (result)
+        {
+        case QMessageBox::Yes:
+            save_code();
+            break;
+        case QMessageBox::Cancel:
+            return;
+        default:
+            break;
+        }
+    }
     QString current = cB_lib->currentText();
     setupLibrary();
     setupTitleList();
@@ -351,7 +388,7 @@ void CodeFriends::readCodeData()
     else {
         lbl_attachment_info->setText(QString("Attachment:无"));
     }
-    
+    editormode = EDITORMODE_DEFAULT;
 }
 
 void CodeFriends::search_title()
@@ -377,10 +414,28 @@ void CodeFriends::show_ui_setting()
 }
 
 void CodeFriends::add_code()
-{
+{   
+    if (editormode == EDITORMODE_CHANGED) {
+        QMessageBox msg(QMessageBox::Question, "CodeFriends", tr("是否保存当前代码？"));
+        msg.setStandardButtons(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+        msg.setButtonText(QMessageBox::Yes, tr("保存并继续"));
+        msg.setButtonText(QMessageBox::No, tr("不保存并继续"));
+        msg.setButtonText(QMessageBox::Cancel, tr("取消"));
+        int result = msg.exec();
+        switch (result)
+        {
+        case QMessageBox::Yes:
+            save_code();
+            break;
+        case QMessageBox::Cancel:
+            return;
+        default:
+            break;
+        }
+    }
     lE_title->clear();
     editor->clear();
     lE_title->setFocus();
-    editor_changed_mode = true;
+    editormode = EDITORMODE_DEFAULT;
 }
 

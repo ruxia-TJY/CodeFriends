@@ -12,7 +12,6 @@ QT_END_NAMESPACE
 
 class LineNumberArea;
 
-
 class CodeEditor : public QPlainTextEdit
 {
 	Q_OBJECT
@@ -20,7 +19,7 @@ class CodeEditor : public QPlainTextEdit
 public:
 	CodeEditor(QWidget* parent = nullptr);
 	
-
+    
     void lineNumberAreaPaintEvent(QPaintEvent* event);
     int lineNumberAreaWidth();
 

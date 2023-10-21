@@ -27,6 +27,7 @@
 #include "Highlighter.h"
 #include "CodeEditor.h"
 #include "database.h"
+#include "config.h"
 
 #include "UiAbout.h"
 #include "UiSetting.h"
@@ -38,6 +39,12 @@ class QResizeEvent;
 class QSize;
 class QWidget;
 QT_END_NAMESPACE
+
+enum editorMode {
+    EDITORMODE_DEFAULT,
+    EDITORMODE_CHANGED,
+    EDITORMODE_SAVED
+};
 
 class CodeFriends : public QMainWindow
 {
@@ -56,14 +63,16 @@ private:
     Ui::CodeFriendsClass ui;
 
     // 当前文本框是否为改变
-    bool editor_changed_mode = false;
+    editorMode editormode = EDITORMODE_DEFAULT;
 
     void closeEvent(QCloseEvent* event);
 
-    void setupEditor();
     void setupUI();
+    void setupConfig();
 
     void timeUpdate();
+
+    Config config;
 
     UiAbout* uiabout;
     UiSetting* uisetting;

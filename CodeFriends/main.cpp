@@ -27,6 +27,7 @@ SOFTWARE.
 #include <QtWidgets/QApplication>
 #include <qfont.h>
 #include <qtranslator.h>
+#include "config.h"
 
 int main(int argc, char *argv[])
 {
@@ -39,12 +40,10 @@ int main(int argc, char *argv[])
     qtTranslator.load(":/qm/Translation/Translation_zh_CN.qm");
     //qtTranslator.load(":/qm/Translation/Translation_en.qm");
     a.installTranslator(&qtTranslator);
-
-    QFont font = a.font();
-    font.setPointSize(10);
-    a.setFont(font);
-
-
+    
+    Config config;
+    a.setFont(config.Font_default);
+   
     CodeFriends w;
     w.show();
     return a.exec();
